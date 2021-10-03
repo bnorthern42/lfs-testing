@@ -12,7 +12,7 @@ sudo apt-get install bash binutils bison bzip2 coreutils diffutils gawk gcc glib
 export LFS=/mnt/lfs
 export LFS_Target=x86_64-lfs-linux-gnu
 export LFS_TGT=x86_64-lfs-linux-gnu
-export LFS_DISK=/dev/sdc
+export LFS_DISK=/dev/sdb 
 
 ## DO PARTITION SETUP IF IT DOES NOT ALREADY EXIST
 if ! grep -q "$LFS" /proc/mounts; then
@@ -58,40 +58,54 @@ export PATH="$LFS/tools/bin:$PATH"
 
 #download the packages
 source download.sh
+#because the headers is really a part of the kernel and not really a package. also see below I made a "special" flag for 
+#these types of custom scripts in the packageinstall.sh
+#cp linux-*.tar* linux.tar.xz
+#source packageinstall.sh 5 linux-api-headers
 
 
-
-
+## NOTE linux in ch 5 is really the api-headers but uses same tar as kernel...
+# binutils gcc
 T="TRUE"
 F="FALSE"
 S="gcc"
-CURR="6"
+CURR="6" 
 #install packages chapter 5 # 
-	for package in binutils gcc linux glibc; do
-			echo -n ""		
+	for package in binutils linux gcc glibc; do
+			echo "doing package: $package"		
 			source packageinstall.sh 5 $package $F
+			echo "done with package: $package"
+			sleep 3
 	done
 #libstdc++ lib:	
 source packageinstall.sh 5 $S $T
 
 for package in m4 ncurses bash coreutils diffutils file findutils gawk grep gzip make patch sed tar xz binutils gcc; do
-		echo -n ""
+		echo "doing package: $package"
 		source packageinstall.sh 6 $package $F
+		echo "done with package: $package"
+		sleep 4
 done
-
-	#--- comment all lines below until I fix ch7+
-#	sleep 30
-#	chmod ugo+x preparechroot.sh
-#	chmod ugo+x insidechroot.sh
-#	echo "LFS:: $LFS"
-# 	sudo ./preparechroot.sh "$LFS"
+	## lets backup this now:
+	echo "now doing chroot things"
+	#---source packageinstall.sh 6 m4 $F
+	sleep 3
+	chmod ugo+x preparechroot.sh
+	chmod ugo+x insidechroot.sh
+	echo "LFS:: $LFS"
+    sudo ./preparechroot.sh "$LFS"
 		
-#	echo "ENTERING CHROOT ENVIRONMENT..."
-#	sleep 3
-#	echo "LFSch:: $LFS"
-#   	sudo chroot "$LFS" /usr/bin/env -i \
-#	HOME=/root \
-#	TERM="$TERM" \
-#	PS1='(lfs chroot) \u:\w\$ ' \
-#	PATH=/bin:/usr/bin:/sbin:/usr/sbin \
-#	/bin/bash --login +h -c "/sources/insidechroot.sh"
+	echo "ENTERING CHROOT ENVIRONMENT..."
+	sleep 2
+	echo "LFSch:: $LFS"
+	echo "test: "
+	pwd
+	/usr/bin/env | grep HOME
+    sudo chroot /mnt/lfs /usr/bin/env \
+		HOME=/root \
+		TERM="$TERM" \
+		PS1="(lfs chroot) \u:\w\$" \
+		PATH="/bin:/usr/bin:/sbin:/usr/sbin" \
+		/bin/bash --login +h -c "/sources/insidechroot.sh"
+#Special Case libstdc++
+#source packageinstall.sh 5 $S $T
