@@ -17,5 +17,9 @@ $LFS=/mnt/lfs
 ```
 
 ## WILL ONLY WORK UP TO CHAPTER 6
+
+- Tested on:
+  - Ubuntu 20.04
+  - Mint 20
   
 
