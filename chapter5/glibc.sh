@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+#bnorthern fix by adding lib64 directory
 #First, create a symbolic link for LSB compliance.
 case $(uname -m) in
     i?86)  sudo ln -sfv ld-linux.so.2 $LFS/lib/ld-lsb.so.3
@@ -10,7 +10,7 @@ case $(uname -m) in
     ;;
 esac
 
-patch -Np1 -i ../glibc-2.34-fhs-1.patch
+patch -Np1 -i ../glibc-*-fhs-1.patch
 
 mkdir -v build
 cd build
